@@ -1,0 +1,299 @@
+---
+title: Explore How School and Student-Level Factors Influence Students’ Mathematics Performance- Using 2012 PISA Hong Kong Sample
+author: "Yi-jung Wu"
+date: |
+  `r format(Sys.time(), '%B %d, %Y')`
+geometry: margin = 1.15in              # margin widths
+fontsize: 12pt                         # text size
+bibliography: bibliography-finalpaper.bib # bibliography file
+biblio-style: authoryear               # citation style
+urlcolor: blue                         # links to external URLs
+citecolor: black                       # links to bibliography
+linkcolor: magenta                     # internal figures, footnotes, etc.
+indent: false                          # paragraph format
+                                       # (true for indented paragraphs)
+output: 
+  bookdown::pdf_document2:
+    keep_tex: true
+    latex_engine: pdflatex
+    number_sections: true
+    toc: true
+    fig_caption: true
+    citation_package: biblatex
+    includes: 
+      in_header: 
+        - latex-preamble.tex
+  bookdown::word_document2:
+    toc: true
+  bookdown::html_document2: default
+---
+
+# Introduction
+
+Mathematical literacy is one of the core competencies for all students and its expectation is firmly institutionalized in modern education. Therefore, mathematics becomes a taken-for-granted subject that must appear in the class schedule in school whatever the location is in a highly modernized metropolis or a peripheral rural region. However, given its abstract and logical character, it is deemed as one of the most challenging subjects for teachers and students. 
+
+Factors that foster students’ mathematical performance is an area that is highly relevant for educational practitioners. Apart from well -developed students’ individualistic explanations such as mathematics self-concept, mathematical interest and mathematics anxiety, the scholarly focus now shifts to the effect of teachers’ pedagogies and school resources. Discussion of the importance of the classroom and school environment on academic performance, net of the individualistic causes such as students’ cognitive abilities, psychological states and their family background, deserve our attention [@chiu-khoo:2005:effects]. Previous studies identify some school characteristics are nominated as factors that bolster students’ mathematics learning, they are (1) teachers’ instructional and pedagogical skills; (2) good school-based curriculum and (3) stable and cooperative school-family relations. These school characteristics are more “real” and hardware aspects of school organizations, implying they are correlated with the tangible school financial and human resources. Literature also identifies the effect of more dynamics dimension of school environment on student learning, namely (4) the composition of students' bodies and peer interaction. The methodological tools to test against these explanations typically involve multi-level hierarchical regression as it involves both students’ individualistic explanations and teachers/school level explanation. 
+
+While the literature provides a long list of potential causes (and they imply potential educational intervention measures), some critical remarks came from cross-national studies on mathematics performances. The classic “Heynemen-Loxley effect” told us that the effect of school on student academic performance is highly dependent on the economic situation of the hosting country. It opens the Pandora’s box that the effect of school on students is varying across the country. School effect is not uniform but itself correlated with the systemic characteristics of ones’ educational system. For example, the degree of institutionalization of the education system is the key factor in predicting the coefficient of school effect on mathematics performances in Baker and his colleagues’ work. Swedish case also extending our understanding on the consequences of introducing a particular admission system (school choice) on the school effect on student performance. The more comparative case is needed in deepen our understanding on the school effect on mathematical ability. 
+
+This study, built on the well-established and verified individualistic and school-level explanations, tries to demonstrate an interesting phenomena in Hong Kong: most of the variations in the instrument of positive psychological states of students - which is perceived as strong predictors of mathematic performance -  are explained by the between-school differences rather than within school differences. On the other hand, as nearly most of the schools are partly or fully subsidized by the government, each school received similar governmental input regarding the number of teachers and other school facilitates. Tsang (2012) documented the effort of government in making sure all students in the Hong Kong education system received an actually equal amount of per-student investment from the 1980s onward. If the equality effort is successful, schools should be no substantial differences in terms of school resources. And it is then predicted the school effect on mathematics performance should be very similar among schools given all schools received the same amount of government input (i.e. the quality of teacher team and facilities should be very similar). However, school variations in academic performance (even within public schools) were evident in both PISA data and local literature. It means that variations in mathematics ability were mostly explained by variations between schools in Hong Kong. In other words, students’ mathematics ability is most likely dependent on the schools that students attend.  In this context, the research questions were formulated as the following. 
+
+1.	How do students’ psychological factors affect their mathematics performance varying by schools? 
+2.	How does parental support for their children’s learning affect the children’s mathematics performance, and how does this vary by the school?
+3.	How do school-level factors, such as teacher autonomy, teacher participation in school, teacher shortage, and educational resources, influence students’ mathematics learning and vary by the school?
+4.	Considering the variation of each school’s low socio-economic and cultural backgrounds, student psychological characteristics, teacher, and parental factors, is there any difference compared to the models without considering this variance?
+5.	Building on research question 4 and by counting the variation of school quality, based on student psychological characteristics, teacher, and parental factors, is there any difference compared to the models without considering this variance?
+
+# Description of Data
+
+The Program for International Student Assessment (PISA) has been collecting the academic performance of 15-year-old students’ from more than sixty-five countries since 2000. Each year, the assessment focuses on different themes including reading, mathematics, and science literacies. In 2012, PISA focused on students’ mathematics learning well. The 2012 PISA Hong Kong sample is a two-level data structure consisting of school-level and student-level information. The student-level data has information from both students and their parents. The school-level information is made up of a questionnaire filled by each school’s principal. The student-level variables that I use in this study are mathematics self-efficacy, mathematics anxiety, perseverance, openness for problem solving, SES, and parent-perceived school quality. The school-level variables that I use are school autonomy, teacher participation, educational resources, and teacher shortage. SES is calculated from the highest occupational status of parents, the highest educational level of parents, family wealth, cultural possessions, and home educational resources. My analytical sample size is 1406 after using listwise deletion to remove all missing values. Multilevel Modelling and R package lme4 was used for the data analysis.
+
+The 2012 PISA Hong Kong sample is a two-level data structure consisting of school-level and student-level information. The student-level data has information from both students and their parents. The school-level information is made up of a questionnaire filled by each school’s principal. The student-level variables that I use in this study are mathematics self-efficacy, mathematics anxiety, perseverance, openness for problem solving, SES, parental support, and parent perceived school quality. The school-level variables that I use are school autonomy, teacher participation, educational resources, and teacher shortage. SES is calculated from the highest occupational status of parents, the highest educational level of parents, family wealth, cultural possessions, and home educational resources. The remaining variables are from questionnaire items. 
+
+```{r chunk-options, include = FALSE, echo = FALSE}
+knitr::opts_chunk$set(
+  include = FALSE, echo = FALSE, collapse = TRUE,
+  warning = FALSE, message = FALSE,
+  cache = TRUE, 
+  fig.align = "center",
+  fig.width = 4, fig.height = 3, 
+  out.width = "80%"
+)
+```
+
+```{r package}
+library(here)
+library(mice)
+library(mitml)
+library(lme4)
+```
+
+```{r read-data, include= TRUE, echo = TRUE}
+PISA <- read.csv(here("data","PISAHKG2012.csv"))
+```
+
+The gender distribution of the HK sample is shown below. Female and male students’ percentages are almost equal, with male students comprising a slightly higher proportion than female students. 
+
+```{r histogram, fig.cap = "Distribution of outcome", include = TRUE}
+hist(PISA$Math_PV1, main = "Distribution of outcome", xlab = 'Math grade of PV1')
+```
+
+Next, I checked for missing values. For variables of self-efficacy, anxiety, perseverance, and openness for problem solving, there is around thirty-four percentage of data are missing. For variables of SES, parental support and parent-perceived school quality, there is three percent of data missing. Missing data was imputed five times for each dataset with all independent variables and one outcome of the plausible values separately. Since there are five plausible values, we will have five datasets that each dataset has one plausible value. In total, there will be twenty five datasets after the imputation.  
+
+```{r createfivedata, include= TRUE, echo = TRUE}
+#create five datasets for PV1 to PV5
+PV1<-PISA[,c("SCHOOLID","StIDStd" ,"SES","Gender","Autonomy",
+            "Tch_Participation","Tch_Short","Edu_Resource",
+            "Anxiety_Math" ,"Efficacy" ,"Persev","Openness","Income" ,
+            "Percepted_Quality","Par_Support", "Student_weight",
+             "Math_PV1")]
+
+PV2<-PISA[,c("SCHOOLID","StIDStd" ,"SES","Gender","Autonomy",
+             "Tch_Participation","Tch_Short","Edu_Resource",
+             "Anxiety_Math" ,"Efficacy" ,"Persev","Openness","Income" ,
+             "Percepted_Quality","Par_Support", "Student_weight",
+             "Math_PV2")]
+
+PV3<-PISA[,c("SCHOOLID","StIDStd" ,"SES","Gender","Autonomy",
+             "Tch_Participation","Tch_Short","Edu_Resource",
+             "Anxiety_Math" ,"Efficacy" ,"Persev","Openness","Income" ,
+             "Percepted_Quality","Par_Support", "Student_weight",
+             "Math_PV3")]
+
+PV4<-PISA[,c("SCHOOLID","StIDStd" ,"SES","Gender","Autonomy",
+             "Tch_Participation","Tch_Short","Edu_Resource",
+             "Anxiety_Math", "Efficacy", "Persev", "Openness", "Income" ,
+             "Percepted_Quality","Par_Support", "Student_weight",
+             "Math_PV4")]
+
+PV5<-PISA[,c("SCHOOLID","StIDStd" ,"SES","Gender","Autonomy",
+             "Tch_Participation","Tch_Short","Edu_Resource",
+             "Anxiety_Math" ,"Efficacy" ,"Persev","Openness","Income" ,
+             "Percepted_Quality", "Par_Support", "Student_weight",
+             "Math_PV5")]
+```
+
+```{r imputation1, echo = TRUE, results = FALSE}
+# multiple imputation for each inddpendent variables in each plausible dataset five times
+##multiple imputation for PV1
+imp.1<-mice(PV1,m=5,method=c("","","pmm","","","","","","pmm","pmm","pmm","pmm","pmm","pmm","pmm","",""))
+imp.1.dat <- complete(imp.1, action="long", include=FALSE)
+
+##multiple imputation for PV2
+imp.2<-mice(PV2,m=5,method=c("","","pmm","","","","","","pmm","pmm","pmm","pmm","pmm","pmm","pmm","",""))
+imp.2.dat <- complete(imp.2, action="long", include=FALSE)
+
+##multiple imputation for PV3
+imp.3<-mice(PV3,m=5,method=c("","","pmm","","","","","","pmm","pmm","pmm","pmm","pmm","pmm","pmm","",""))
+imp.3.dat <- complete(imp.3, action="long", include=FALSE)
+
+##multiple imputation for PV4
+imp.4<-mice(PV4,m=5,method=c("","","pmm","","","","","","pmm","pmm","pmm","pmm","pmm","pmm","pmm","",""))
+imp.4.dat <- complete(imp.4, action="long", include=FALSE)
+
+##multiple imputation for PV5
+imp.5<-mice(PV2,m=5,method=c("","","pmm","","","","","","pmm","pmm","pmm","pmm","pmm","pmm","pmm","",""))
+imp.5.dat <- complete(imp.5, action="long", include=FALSE)
+```
+
+```{r mergesplit, include= TRUE, echo = TRUE}
+# change the variable name of "Math_PV1" into "Math_PV"
+colnames(imp.1.dat)[19]<-c("Math_PV")
+colnames(imp.2.dat)[19]<-c("Math_PV")
+colnames(imp.3.dat)[19]<-c("Math_PV")
+colnames(imp.4.dat)[19]<-c("Math_PV")
+colnames(imp.5.dat)[19]<-c("Math_PV")
+
+# merge the separate imputation datasets into one
+imp.dat <- rbind(imp.1.dat, imp.2.dat,imp.3.dat,imp.4.dat,imp.5.dat)
+
+# split stacked data into separate files
+implist <- split(imp.dat, imp.dat$.imp)
+implist <- as.mitml.list(implist)
+```
+
+# The Relationship Between Outcome and Predictors
+
+My research question is: how do students’ affective characteristics, parental factors, and school-level factors affect students’ mathematical performance after taking into consideration school-level variables. The assumption is that each school has a different correlation in terms of these predictors for mathematics performance. Therefore, I drew a linear relationship between each predictor and the outcome variables. I used mathematics plausible value as the outcome. 
+
+```{r plot1, fig.cap = "Math achievement vs. SES", include = TRUE}
+# Figure 1: Plot of math score vs. SES across schools
+par(mfrow= c(1, 1))
+PISA$SCHOOLID<-as.factor(PISA$SCHOOLID)
+plot(jitter(PISA$SES), PISA$Math_PV1, main = "Math achievement score versus SES", xlab = 'SES', ylab = 'Math score', col = 'gray')
+for(i in levels(PISA$SCHOOLID)){
+  out.lm.i <- lm(Math_PV1 ~ SES, data = PISA, PISA$SCHOOLID == i) 
+  abline(out.lm.i$coef[1], out.lm.i$coef[2], col = 1)
+}
+
+out.lm1 <- lm(Math_PV1 ~ SES, data = PISA)
+abline(out.lm1$coef[1], out.lm1$coef[2], lwd = 3, col = 2)
+```
+
+
+```{r plot2, fig.cap = "Math achievement vs. anxiety", include = TRUE}
+# Figure 2: Plot of math score vs. anexity across schools
+par(mfrow= c(1, 1))
+plot(jitter(PISA$Anxiety_Math), PISA$Math_PV1, main = "Math achievement score versus math anxiety", xlab = 'Math Anxiety', ylab = 'Math score', col = 'gray')
+for(i in levels(PISA$SCHOOLID)){
+  out.lm.i <- lm(Math_PV1 ~ Anxiety_Math, data = PISA, PISA$SCHOOLID == i) 
+  abline(out.lm.i$coef[1], out.lm.i$coef[2], col = 1)
+}
+
+out.lm2 <- lm(Math_PV1 ~ Anxiety_Math, data = PISA)
+abline(out.lm2$coef[1], out.lm2$coef[2], lwd = 3, col = 2)
+```
+
+```{r plot3, fig.cap = "Math anxiety vs. SES", include = TRUE}
+# Figure 3: Plot of math anexity vs. ses across schools
+par(mfrow= c(1, 1))
+plot(jitter(PISA$SES), PISA$Anxiety_Math, main = "Math anxiety versus SES", xlab = 'SES', ylab = 'Math anxiety', col = 'gray')
+for(i in levels(PISA$SCHOOLID)){
+  out.lm.i <- lm(Anxiety_Math ~ SES, data = PISA, PISA$SCHOOLID == i) 
+  abline(out.lm.i$coef[1], out.lm.i$coef[2], col = 1)
+}
+
+out.lm3 <- lm(Anxiety_Math ~ SES, data = PISA)
+abline(out.lm3$coef[1], out.lm3$coef[2], lwd = 3, col = 2)
+
+```
+
+```{r plot4, fig.cap = "Math achievement vs. Math efficacy", include = TRUE}
+par(mfrow= c(1, 1))
+plot(jitter(PISA$Efficacy), PISA$Math_PV1, main = "Math achievement score versus math efficacy", xlab = 'Math efficacy', ylab = 'Math score', col = 'gray')
+for(i in levels(PISA$SCHOOLID)){
+  out.lm.i <- lm(Math_PV1 ~ Efficacy, data = PISA, PISA$SCHOOLID == i) 
+  abline(out.lm.i$coef[1], out.lm.i$coef[2], col = 1)
+}
+
+out.lm4 <- lm(Math_PV1 ~ Efficacy, data = PISA)
+abline(out.lm4$coef[1], out.lm4$coef[2], lwd = 3, col = 2)
+```
+
+```{r plot5, fig.cap = "Math achievement vs. Math Perservence", include = TRUE}
+par(mfrow= c(1, 1))
+plot(jitter(PISA$Persev), PISA$Math_PV1, main = "Math achievement score versus math perservence", xlab = 'Math persev', ylab = 'Math score', col = 'gray')
+for(i in levels(PISA$SCHOOLID)){
+  out.lm.i <- lm(Math_PV1 ~ Persev, data = PISA, PISA$SCHOOLID == i) 
+  abline(out.lm.i$coef[1], out.lm.i$coef[2], col = 1)
+}
+
+out.lm5 <- lm(Math_PV1 ~ Persev, data = PISA)
+abline(out.lm5$coef[1], out.lm5$coef[2], lwd = 3, col = 2)
+```
+
+```{r plot6, fig.cap = "Math achievement vs. Math Openness", include = TRUE}
+par(mfrow= c(1, 1))
+plot(jitter(PISA$Openness), PISA$Math_PV1, main = "Math achievement score versus openness", xlab = 'Math openness', ylab = 'Math score', col = 'gray')
+for(i in levels(PISA$SCHOOLID)){
+  out.lm.i <- lm(Math_PV1 ~ Openness, data = PISA, PISA$SCHOOLID == i) 
+  abline(out.lm.i$coef[1], out.lm.i$coef[2], col = 1)
+}
+
+out.lm6 <- lm(Math_PV1 ~ Openness, data = PISA)
+abline(out.lm6$coef[1], out.lm6$coef[2], lwd = 3, col = 2)
+```
+
+
+```{r plot10, fig.cap = "Math grade vs. teacher autonomy", include = TRUE}
+par(mfrow= c(1, 1))
+plot(jitter(PISA$Autonomy), PISA$Math_PV1, main = "Teacher autonomy versus math grade", xlab = ' teacher autonomy', ylab = 'Math grade', col = 'gray')
+out.lm10 <- lm(Math_PV1 ~ Autonomy, data = PISA)
+abline(out.lm10$coef[1], out.lm10$coef[2], lwd = 3, col = 2)
+```
+
+```{r plot11, fig.cap= "Math grade vs. teacher participation", include = TRUE}
+par(mfrow= c(1, 1))
+plot(jitter(PISA$Tch_Participation), PISA$Math_PV1, main = "Teacher participation versus math grade", xlab = ' teacher participation', ylab = 'Math grade', col = 'gray')
+out.lm11 <- lm(Math_PV1 ~ Tch_Participation, data = PISA)
+abline(out.lm11$coef[1], out.lm11$coef[2], lwd = 3, col = 2)
+```
+
+```{r plot12, fig.cap= "Math grade vs. teacher shortage", include = TRUE}
+par(mfrow= c(1, 1))
+plot(jitter(PISA$Tch_Short), PISA$Math_PV1, main = "Teacher shortage versus math grade", xlab = ' teacher shortage', ylab = 'Math grade', col = 'gray')
+out.lm12 <- lm(Math_PV1 ~ Tch_Short, data = PISA)
+abline(out.lm12$coef[1], out.lm12$coef[2], lwd = 3, col = 2)
+```
+
+Figure 2 shows that SES is positively correlated to math grades overall with a small number of variations in some schools. Figure 3 shows that math anxiety is negatively correlated to math grades with only a few schools showing the opposite trend. Figure 4 shows that mathematics anxiety is slightly negatively correlated to SES. Figure 5 shows that mathematics achievement is negatively correlated to self-efficacy. Figure 6 shows that mathematics achievement is positively correlated with perseverance.      
+
+Regarding level 2 school-level variables, I also drew each variable with math grade accordingly. Figure 10 shows that educational resources are positively correlated to mathematics achievement. Figure 11 shows that teacher autonomy is negatively associated with mathematics achievement. Figure 12 shows that teacher participation is negatively correlated to mathematics achievement. Figure 13 shows that teacher shortage is negatively correlated to mathematics achievement. From the information represented in these graphs, I conducted a multilevel analysis for checking the holistic systematical relationship with all these variables next to mathematics performance in the following section.
+
+
+# Multilevel Modelling
+I then tested each model with random intercept and random slope. Model 1 is an empty model with only school effects on mathematics performance. 
+
+```{r HLMmodel , include= TRUE, echo = TRUE}
+# fit multilevel model
+fm1 <- with(implist, lmer( Math_PV~ 1 + (1|SCHOOLID), weights=Student_weight)) #my multilevel model
+out1<-testEstimates(fm1, var.comp=TRUE)
+out1
+
+fm2 <- with(implist, lmer( Math_PV~ 1 + SES +  Anxiety_Math + Efficacy + Openness + Persev + (1|SCHOOLID), weights=Student_weight))
+out2<-testEstimates(fm2, var.comp=TRUE)
+out2
+
+fm3 <- with(implist, lmer( Math_PV~ 1 + SES +  Anxiety_Math + Efficacy + Openness + Persev +  Par_Support + Percepted_Quality + (1|SCHOOLID), weights=Student_weight))
+out3<-testEstimates(fm3, var.comp=TRUE)
+out3
+
+fm4 <- with(implist, lmer( Math_PV~ 1 + SES +  Anxiety_Math + Efficacy + Openness + Persev +  Par_Support + Percepted_Quality + Autonomy + Tch_Participation + Edu_Resource + Tch_Short + (1 + SES|SCHOOLID), weights=Student_weight))
+out4<-testEstimates(fm4, var.comp=TRUE)
+out4
+
+fm5 <- with(implist, lmer( Math_PV~ 1 + SES +  Anxiety_Math + Efficacy + Openness + Persev +  Par_Support + Percepted_Quality + Autonomy + Tch_Participation + Edu_Resource + Tch_Short + (1 + SES + Percepted_Quality|SCHOOLID), weights=Student_weight))
+out5<-testEstimates(fm5, var.comp=TRUE)
+out5
+
+testModels(fm1, fm2, method = "D3")
+testModels(fm2, fm3, method = "D3")
+testModels(fm3, fm4, method = "D3")
+testModels(fm4, fm5, method = "D3")
+
+summary<- anova(fm1, fm2, fm3, fm4, fm5)
+summary
+```
+
+# Summary
+In this study, I took the school level into account to understand how the school level influences students’ psychological variables and mathematics performance in the Hong Kong context. The final model (Model 4) includes seven level 1 predictors (SES, math anxiety, self-efficacy, openness, perseverance, parental support, and parental-perceived school quality) with a random intercept and slope for SES and three Level 2 predictors (teacher autonomy, teacher participation, educational resources, and teacher shortage). SES, self-efficacy, and parental-perceived school quality have a positive impact on student mathematics performance. 
